@@ -9,7 +9,7 @@ struct Args {
     /// Path of folder
     path: String,
 
-    /// Optional output folder. Default to <PATH>-1
+    /// Optional output folder. Defaults to <PATH>-1
     #[arg(short, long)]
     output: Option<String>,
 }
@@ -46,11 +46,8 @@ fn main() {
         None => &args.path,
     };
 
-    println!("{:?}", &arg_path);
     let output_path = args.output.unwrap_or(format!("{}-{}", arg_path, "1"));
-
     let output_path = Path::new(&output_path);
-    println!("{:?}", &output_path);
 
     // If output dir does not exist, create it
     if let Err(_) = fs::read_dir(&output_path) {
@@ -67,7 +64,7 @@ fn main() {
 
         if buf != "Y" {
             println!("Aborting");
-            return;
+            std::process::exit(1)
         } else {
             println!("Overwriting");
             fs::create_dir(&output_path).unwrap();
