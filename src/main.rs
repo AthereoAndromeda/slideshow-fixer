@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{fs, io, path::Path};
 
 use clap::Parser;
 use slideshow_fixer::write_files;
@@ -55,6 +55,23 @@ fn main() {
     // If output dir does not exist, create it
     if let Err(_) = fs::read_dir(&output_path) {
         fs::create_dir(&output_path).unwrap();
+    } else {
+        println!(
+            "{} already exists. Overwrite directory? [Y/n]",
+            &output_path.display()
+        );
+
+        let mut buf = String::new();
+        io::stdin().read_line(&mut buf).unwrap();
+        let buf = buf.trim();
+
+        if buf != "Y" {
+            println!("Aborting");
+            return;
+        } else {
+            println!("Overwriting");
+            fs::create_dir(&output_path).unwrap();
+        }
     }
 
     write_files(&entries, output_path).unwrap();
