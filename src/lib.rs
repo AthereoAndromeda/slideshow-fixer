@@ -6,6 +6,9 @@ use std::{
 mod zip;
 pub use crate::zip::*;
 
+use wasm_bindgen::prelude::wasm_bindgen;
+
+// #[wasm_bindgen]
 pub fn write_files(entries: &Vec<DirEntry>, output_path: &Path) -> Result<(), std::io::Error> {
     for entry in entries {
         let new_path = output_path.join(entry.file_name());
@@ -16,4 +19,9 @@ pub fn write_files(entries: &Vec<DirEntry>, output_path: &Path) -> Result<(), st
     }
 
     Ok(())
+}
+
+#[wasm_bindgen]
+pub fn js_write_files(file: &[u8]) -> u8 {
+    file[0]
 }
