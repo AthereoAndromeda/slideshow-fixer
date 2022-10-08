@@ -19,10 +19,9 @@ fn main() {
     // println!("{}", args.path);
 
     let mut entries = Vec::new();
-    let input_dir = fs::read_dir(&args.path);
 
     // Check if dir exists
-    let input_dir = match input_dir {
+    let input_dir = match fs::read_dir(&args.path) {
         Ok(f) => f,
         Err(e) => {
             panic!("{}", e);
@@ -41,13 +40,11 @@ fn main() {
     entries.sort_by(|a, b| a.path().cmp(&b.path()));
 
     // Remove trailing /
-    let arg_path = match &args.path.strip_suffix("/") {
-        Some(p) => *p,
-        None => &args.path,
-    };
+    let arg_path = &args.path.strip_suffix("/").unwrap_or(&args.path);
 
-    let output_path = args.output.unwrap_or(format!("{}-{}", arg_path, "1"));
-    let output_path = Path::new(&output_path);
+    // Create output path name
+    let outpath_name = args.output.unwrap_or(format!("{}-{}", arg_path, "1"));
+    let output_path = Path::new(&outpath_name);
 
     // If output dir does not exist, create it
     if let Err(_) = fs::read_dir(&output_path) {
