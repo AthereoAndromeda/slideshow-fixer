@@ -21,9 +21,14 @@ fn main() {
     // Check if dir exists
     let input_dir = match fs::read_dir(&args.path) {
         Ok(f) => f,
-        Err(e) => {
-            panic!("{}", e);
-        }
+        Err(e) => match e.kind() {
+            io::ErrorKind::NotFound => {
+                eprintln!("Cannot Find Directory!\n{}", e);
+                std::process::exit(1);
+            }
+
+            _ => panic!("{}", e),
+        },
     };
 
     for file in input_dir {
