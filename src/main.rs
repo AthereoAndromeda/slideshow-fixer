@@ -51,7 +51,7 @@ fn main() {
         fs::create_dir(&output_path).unwrap();
     } else {
         println!(
-            "{} already exists. Overwrite directory? [Y/n]",
+            "{} already exists. Overwrite directory? (Will erase ALL content of directory) [Y/n]",
             &output_path.display()
         );
 
@@ -60,10 +60,11 @@ fn main() {
         let buf = buf.trim();
 
         if buf != "Y" {
-            println!("Aborting");
+            println!("Aborting...");
             std::process::exit(1)
         } else {
-            println!("Overwriting");
+            println!("Overwriting...");
+            fs::remove_dir_all(&output_path).unwrap();
             fs::create_dir(&output_path).unwrap();
         }
     }
