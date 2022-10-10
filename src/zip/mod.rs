@@ -110,9 +110,5 @@ mod test {
         ];
 
         let mut a = zip_archive(&files).unwrap();
-
-        let mut file = std::fs::File::create("./amongus.zip").unwrap();
-        // std::io::copy(&mut a, &mut file).unwrap();
-        file.write_all(&a.into_inner());
     }
 }
