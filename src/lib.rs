@@ -1,10 +1,10 @@
 use std::{
     fs::{self, DirEntry},
-    io::{self, Read, Seek},
+    io::{self, Cursor, Read, Seek, Write},
     path::Path,
 };
 
-use zip::ZipArchive;
+use zip::{result::ZipResult, write::FileOptions, CompressionMethod, ZipArchive, ZipWriter};
 
 pub fn write_files(entries: &Vec<DirEntry>, output_path: &Path) -> Result<(), std::io::Error> {
     for entry in entries {
@@ -73,17 +73,52 @@ pub fn sort_files(files: &mut Vec<MyFile>) {
     files.sort_by(|a, b| a.name.cmp(&b.name));
 }
 
+pub fn zip_files(files: &Vec<MyFile>) -> ZipResult<Cursor<Vec<u8>>> {
+    let buf_writer = Cursor::new(Vec::new());
+    let mut zip_writer = ZipWriter::new(buf_writer);
+
+    let options = FileOptions::default().compression_method(CompressionMethod::Deflated);
+
+    for file in files {
+        zip_writer.start_file(&file.name, options)?;
+        zip_writer.write_all(&file.buffer)?;
+    }
+
+    zip_writer.finish()
+}
+
 #[cfg(test)]
 mod test {
-    use super::extract_zip;
+    use crate::{extract_zip, zip_files, MyFile};
     use std::{fs::File, path::Path};
 
     #[test]
     pub fn zip_extract() {
         let path = Path::new("./test/e.zip");
         let zip_file = File::open(path).unwrap();
-        let a = extract_zip(zip_file).unwrap();
+        let files = extract_zip(zip_file).unwrap();
 
-        assert_eq!(a.len(), 4)
+        assert_eq!(files.len(), 4);
+        println!("{}", files[0]);
+    }
+
+    #[test]
+    pub fn write_test() {
+        let files = vec![
+            MyFile {
+                name: "01.jpg".to_string(),
+                buffer: vec![0, 32, 155, 13],
+            },
+            MyFile {
+                name: "02.jpg".to_string(),
+                buffer: vec![64, 22, 155, 13],
+            },
+            MyFile {
+                name: "03.jpg".to_string(),
+                buffer: vec![100, 52, 55, 123],
+            },
+        ];
+
+        let a = zip_files(&files).unwrap();
     }
 }
