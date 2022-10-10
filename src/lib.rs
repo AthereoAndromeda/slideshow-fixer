@@ -1,6 +1,6 @@
 use std::{
-    fs::{self, DirEntry, File},
-    io,
+    fs::{self, DirEntry},
+    io::{self, Read, Seek},
     path::Path,
 };
 
@@ -18,8 +18,13 @@ pub fn write_files(entries: &Vec<DirEntry>, output_path: &Path) -> Result<(), st
     Ok(())
 }
 
-pub fn extract_zip<'a>(zip_file: File) -> Result<Vec<Vec<u8>>, Box<dyn std::error::Error>> {
-    let mut archive = ZipArchive::new(zip_file).unwrap();
+pub struct MyFile {
+    name: String,
+    buffer: Vec<u8>,
+}
+
+pub fn extract_zip<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, Box<dyn std::error::Error>> {
+    let mut archive = ZipArchive::new(reader).unwrap();
     let mut files = Vec::with_capacity(archive.file_names().count());
 
     for i in 0..archive.len() {
@@ -45,13 +50,20 @@ pub fn extract_zip<'a>(zip_file: File) -> Result<Vec<Vec<u8>>, Box<dyn std::erro
             let mut w_buf = Vec::new();
             io::copy(&mut file, &mut w_buf)?;
 
-            files.push(w_buf);
+            let my_file = MyFile {
+                name: outpath.file_name().unwrap().to_string_lossy().to_string(),
+                buffer: w_buf,
+            };
+
+            files.push(my_file);
         }
     }
 
-    let a = files.iter().map(|f| f.as_slice()).collect::<Vec<_>>();
-
     Ok(files)
+}
+
+pub fn sort_files(files: &mut Vec<MyFile>) {
+    files.sort_by(|a, b| a.name.cmp(&b.name));
 }
 
 #[cfg(test)]
@@ -65,6 +77,6 @@ mod test {
         let zip_file = File::open(path).unwrap();
         let a = extract_zip(zip_file).unwrap();
 
-        println!("{:?}", a);
+        assert_eq!(a.len(), 4)
     }
 }
