@@ -70,6 +70,13 @@ pub fn zip_archive(files: &Vec<MyFile>) -> ZipResult<Cursor<Vec<u8>>> {
     zip_writer.finish()
 }
 
+type ZipMainResult = ZipResult<Cursor<Vec<u8>>>;
+pub fn zip_main<R: Read + Seek>(reader: R) -> ZipMainResult {
+    let mut files = zip_extract(reader).unwrap();
+    zip_sort(&mut files);
+    zip_archive(&files)
+}
+
 #[cfg(test)]
 mod test {
     use crate::{zip_archive, zip_extract, MyFile};
