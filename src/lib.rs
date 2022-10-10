@@ -18,9 +18,16 @@ pub fn write_files(entries: &Vec<DirEntry>, output_path: &Path) -> Result<(), st
     Ok(())
 }
 
+#[derive(Debug)]
 pub struct MyFile {
     name: String,
     buffer: Vec<u8>,
+}
+
+impl std::fmt::Display for MyFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} ({} bytes)", self.name, self.buffer.len())
+    }
 }
 
 pub fn extract_zip<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, Box<dyn std::error::Error>> {
