@@ -13,7 +13,7 @@ impl std::fmt::Display for MyFile {
     }
 }
 
-pub fn extract_zip<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, Box<dyn std::error::Error>> {
+pub fn zip_extract<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, Box<dyn std::error::Error>> {
     let mut archive = ZipArchive::new(reader).unwrap();
     let mut files = Vec::with_capacity(archive.file_names().count());
 
@@ -52,11 +52,11 @@ pub fn extract_zip<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, Box<dyn std
     Ok(files)
 }
 
-pub fn sort_files(files: &mut Vec<MyFile>) {
+pub fn zip_sort(files: &mut Vec<MyFile>) {
     files.sort_by(|a, b| a.name.cmp(&b.name));
 }
 
-pub fn zip_files(files: &Vec<MyFile>) -> ZipResult<Cursor<Vec<u8>>> {
+pub fn zip_archive(files: &Vec<MyFile>) -> ZipResult<Cursor<Vec<u8>>> {
     let buf_writer = Cursor::new(Vec::new());
     let mut zip_writer = ZipWriter::new(buf_writer);
 
@@ -72,14 +72,14 @@ pub fn zip_files(files: &Vec<MyFile>) -> ZipResult<Cursor<Vec<u8>>> {
 
 #[cfg(test)]
 mod test {
-    use crate::{extract_zip, zip_files, MyFile};
+    use crate::{zip_archive, zip_extract, MyFile};
     use std::{fs::File, path::Path};
 
     #[test]
-    pub fn zip_extract() {
+    pub fn zip_extract_test() {
         let path = Path::new("./test/e.zip");
         let zip_file = File::open(path).unwrap();
-        let files = extract_zip(zip_file).unwrap();
+        let files = zip_extract(zip_file).unwrap();
 
         assert_eq!(files.len(), 4);
         println!("{}", files[0]);
@@ -102,6 +102,6 @@ mod test {
             },
         ];
 
-        let a = zip_files(&files).unwrap();
+        let a = zip_archive(&files).unwrap();
     }
 }
