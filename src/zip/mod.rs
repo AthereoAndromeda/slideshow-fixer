@@ -80,7 +80,7 @@ pub fn zip_main<R: Read + Seek>(reader: R) -> ZipMainResult {
 #[cfg(test)]
 mod test {
     use crate::{zip_archive, zip_extract, MyFile};
-    use std::{fs::File, path::Path};
+    use std::{fs::File, io::Write, path::Path};
 
     #[test]
     pub fn zip_extract_test() {
@@ -109,6 +109,10 @@ mod test {
             },
         ];
 
-        let a = zip_archive(&files).unwrap();
+        let mut a = zip_archive(&files).unwrap();
+
+        let mut file = std::fs::File::create("./amongus.zip").unwrap();
+        // std::io::copy(&mut a, &mut file).unwrap();
+        file.write_all(&a.into_inner());
     }
 }
