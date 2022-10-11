@@ -6,8 +6,16 @@ use std::{
 mod zip;
 pub use crate::zip::*;
 
+#[cfg(target_family = "wasm")]
 mod wasm;
-pub use crate::wasm::*;
+
+#[cfg(target_family = "wasm")]
+extern crate wee_alloc;
+
+// Default allocator for WASM
+#[cfg(target_family = "wasm")]
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 pub fn write_files(entries: &Vec<DirEntry>, output_path: &Path) -> Result<(), std::io::Error> {
     for entry in entries {
