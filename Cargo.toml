@@ -13,6 +13,6 @@ crate-type = ["cdylib", "rlib"]
 clap = { version = "4.0.10", features = ["derive"] }
 zip = { version = "0.6.2", features = ["deflate"], default-features = false }
 chrono = { version = "0.4", features = ["clock"], default-features = false }
-# console_error_panic_hook = "0.1.6"
+console_error_panic_hook = "0.1.6"
 # wee_alloc = { version = "0.4.5", optional = true }
 wasm-bindgen = { version = "0.2.83" }

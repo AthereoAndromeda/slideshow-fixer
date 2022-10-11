@@ -9,3 +9,9 @@ In the end, this is just an automated and overglorified copy-paste program. Exce
 it copy pastes in a certain way to make the slides sort correctly.
 
 Written in Rust cuz idk, might create WASM variant for Web version of thing
+
+## WebAssembly
+To compile for WASM, compatible with Vite
+```
+wasm-pack build --target web
+```
