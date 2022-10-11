@@ -4,12 +4,12 @@ use zip::{result::ZipResult, write::FileOptions, CompressionMethod, ZipArchive, 
 #[derive(Debug)]
 pub struct MyFile {
     name: String,
-    buffer: Vec<u8>,
+    buf: Vec<u8>,
 }
 
 impl std::fmt::Display for MyFile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} ({} bytes)", self.name, self.buffer.len())
+        write!(f, "{} ({} bytes)", self.name, self.buf.len())
     }
 }
 
@@ -42,7 +42,7 @@ pub fn zip_extract<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, Box<dyn std
 
             let my_file = MyFile {
                 name: outpath.file_name().unwrap().to_string_lossy().to_string(),
-                buffer: buf_writer,
+                buf: buf_writer,
             };
 
             files.push(my_file);
@@ -64,7 +64,7 @@ pub fn zip_archive(files: &Vec<MyFile>) -> ZipMainResult {
 
     for file in files {
         zip_writer.start_file(&file.name, options)?;
-        zip_writer.write_all(&file.buffer)?;
+        zip_writer.write_all(&file.buf)?;
     }
 
     zip_writer.finish()
@@ -121,13 +121,13 @@ mod test {
         assert!(files.iter().any(|f| f.name == "03.txt"));
 
         // Check file content/buffer (unsorted)
-        assert!(files.iter().any(|f| f.buffer == [0x61, 0x61, 0xA]));
+        assert!(files.iter().any(|f| f.buf == [0x61, 0x61, 0xA]));
         assert!(files
             .iter()
-            .any(|f| f.buffer == [0x61, 0x66, 0x61, 0x73, 0x66, 0xA]));
+            .any(|f| f.buf == [0x61, 0x66, 0x61, 0x73, 0x66, 0xA]));
         assert!(files
             .iter()
-            .any(|f| f.buffer == [0x61, 0x66, 0x61, 0x73, 0x66, 0xA]));
+            .any(|f| f.buf == [0x61, 0x66, 0x61, 0x73, 0x66, 0xA]));
     }
 
     #[test]
@@ -147,15 +147,15 @@ mod test {
         let files = vec![
             MyFile {
                 name: "04.txt".to_string(),
-                buffer: vec![0x61, 0x61, 0xA],
+                buf: vec![0x61, 0x61, 0xA],
             },
             MyFile {
                 name: "07.txt".to_string(),
-                buffer: vec![0x61, 0x66, 0x61, 0x23, 0x66, 0xA],
+                buf: vec![0x61, 0x66, 0x61, 0x23, 0x66, 0xA],
             },
             MyFile {
                 name: "05.txt".to_string(),
-                buffer: vec![0x61, 0x66, 0x60, 0x73, 0x66, 0xA],
+                buf: vec![0x61, 0x66, 0x60, 0x73, 0x66, 0xA],
             },
         ];
 
