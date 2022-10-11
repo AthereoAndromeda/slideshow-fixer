@@ -1,7 +1,9 @@
+use std::io::Write;
 use std::{fs, io, path::Path};
 
 use clap::Parser;
 use slideshow_fixer::write_files;
+use slideshow_fixer::zip_main;
 
 /// A simple utility program to fix slideshow sorting order cuz our TV is shit
 #[derive(Debug, Parser)]
@@ -17,6 +19,20 @@ struct Args {
 fn main() {
     let args = Args::parse();
     let mut entries = Vec::new();
+
+    if args.path.ends_with(".zip") {
+        let file = fs::File::open(&args.path).unwrap();
+        let zip_file = zip_main(file).unwrap();
+
+        // TODO: Fix name
+        let outpath = args.output.unwrap_or(args.path + "-1");
+        // let path_name =Path::new(outpath)
+        let mut outfile = fs::File::create(&outpath).unwrap();
+        outfile.write_all(&zip_file.into_inner()).unwrap();
+
+        println!("File written at {}", &outpath);
+        return;
+    }
 
     // Check if dir exists
     let input_dir = match fs::read_dir(&args.path) {

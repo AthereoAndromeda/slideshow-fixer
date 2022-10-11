@@ -3,6 +3,9 @@ use std::{
     path::Path,
 };
 
+mod zip;
+pub use crate::zip::*;
+
 pub fn write_files(entries: &Vec<DirEntry>, output_path: &Path) -> Result<(), std::io::Error> {
     for entry in entries {
         let new_path = output_path.join(entry.file_name());
