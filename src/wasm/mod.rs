@@ -1,6 +1,12 @@
+#![allow(dead_code)]
 use crate::zip_main;
 use std::io::Cursor;
 use wasm_bindgen::prelude::*;
+use wee_alloc::WeeAlloc;
+
+// Default allocator for WASM
+#[global_allocator]
+static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
 // Import the `window.alert` function from the Web.
 #[wasm_bindgen]
