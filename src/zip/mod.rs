@@ -1,94 +1,19 @@
-use chrono::{Datelike, Timelike};
-use std::io::{self, Cursor, Read, Seek, Write};
-use zip::{result::ZipResult, write::FileOptions, CompressionMethod, ZipArchive, ZipWriter};
+use std::io::{Cursor, Read, Seek};
+use zip::result::ZipResult;
 
-#[derive(Debug)]
-pub struct MyFile {
-    name: String,
-    buf: Vec<u8>,
-}
+mod archive;
+mod extract;
+mod my_file;
+pub use archive::zip_archive;
+pub use extract::zip_extract;
+pub use my_file::MyFile;
 
-impl std::fmt::Display for MyFile {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} ({} bytes)", self.name, self.buf.len())
-    }
-}
-
-pub fn zip_extract<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, Box<dyn std::error::Error>> {
-    let mut archive = ZipArchive::new(reader)?;
-    let mut files = Vec::with_capacity(archive.file_names().count());
-
-    for i in 0..archive.len() {
-        let mut file = archive.by_index(i)?;
-
-        let outpath = match file.enclosed_name() {
-            Some(path) => path.to_owned(),
-            None => continue,
-        };
-
-        if (*file.name()).ends_with('/') {
-            println!("Ignoring subdirectory {}", outpath.display());
-            // println!("File {} extracted to \"{}\"", i, outpath.display());
-            // fs::create_dir_all(&outpath).unwrap();
-        } else {
-            println!(
-                "File {} extracted to \"{}\" ({} bytes)",
-                i,
-                outpath.display(),
-                file.size()
-            );
-
-            let mut buf_writer = Vec::new();
-            io::copy(&mut file, &mut buf_writer)?;
-
-            let my_file = MyFile {
-                name: outpath.file_name().unwrap().to_string_lossy().to_string(),
-                buf: buf_writer,
-            };
-
-            files.push(my_file);
-        }
-    }
-
-    Ok(files)
-}
+type ZipMainResult = ZipResult<Cursor<Vec<u8>>>;
 
 pub fn zip_sort(files: &mut Vec<MyFile>) {
     files.sort_by(|a, b| a.name.cmp(&b.name));
 }
 
-pub fn zip_archive(files: &Vec<MyFile>) -> ZipMainResult {
-    let buf_writer = Cursor::new(Vec::new());
-    let mut zip_writer = ZipWriter::new(buf_writer);
-
-    let date_time = chrono::offset::Utc::now();
-    let base_options = FileOptions::default().compression_method(CompressionMethod::Deflated);
-
-    for i in 0..files.len() {
-        let file = &files[i];
-
-        // Increment `Date Modified` by 1 second for each successive file
-        let date_time = date_time + chrono::Duration::seconds(i as i64);
-
-        let zip_date_time = zip::DateTime::from_date_and_time(
-            date_time.year() as u16,
-            date_time.month() as u8,
-            date_time.day() as u8,
-            date_time.hour() as u8,
-            date_time.minute() as u8,
-            date_time.second() as u8,
-        )
-        .unwrap();
-
-        let options = base_options.last_modified_time(zip_date_time);
-        zip_writer.start_file(&file.name, options)?;
-        zip_writer.write_all(&file.buf)?;
-    }
-
-    zip_writer.finish()
-}
-
-type ZipMainResult = ZipResult<Cursor<Vec<u8>>>;
 pub fn zip_main<R: Read + Seek>(reader: R) -> ZipMainResult {
     let mut files = zip_extract(reader).unwrap();
     zip_sort(&mut files);
