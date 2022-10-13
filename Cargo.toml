@@ -5,7 +5,27 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+wasm = [
+    "dep:console_error_panic_hook",
+    "dep:wee_alloc",
+    "dep:wasm-bindgen",
+    "chrono/wasmbind"
+]
+
 [dependencies]
 clap = { version = "4.0.10", features = ["derive"] }
 zip = { version = "0.6.2", features = ["deflate"], default-features = false }
 chrono = { version = "0.4", features = ["clock"], default-features = false }
+
+# WASM-only deps
+console_error_panic_hook = { version = "0.1.7", optional = true }
+wee_alloc = { version = "0.4.5", optional = true }
+wasm-bindgen = { version = "0.2.83", optional = true }
+
+[profile.release]
+lto = true
+# opt-level = "s"
