@@ -61,12 +61,13 @@ pub fn zip_archive(files: &Vec<MyFile>) -> ZipMainResult {
     let buf_writer = Cursor::new(Vec::new());
     let mut zip_writer = ZipWriter::new(buf_writer);
 
-    // TODO: Add wasm-compat time for modified
     let date_time = chrono::offset::Utc::now();
     let base_options = FileOptions::default().compression_method(CompressionMethod::Deflated);
 
     for i in 0..files.len() {
         let file = &files[i];
+
+        // Increment `Date Modified` by 1 second for each successive file
         let date_time = date_time + chrono::Duration::seconds(i as i64);
 
         let zip_date_time = zip::DateTime::from_date_and_time(
