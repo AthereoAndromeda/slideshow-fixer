@@ -12,6 +12,13 @@ Written in Rust cuz idk, might create WASM variant for Web version of thing
 
 ## WebAssembly
 To compile for WASM, compatible with Vite
+
+**Debug:**
 ```
-wasm-pack build -t web -- --features wasm
+wasm-pack build --dev -t web --features wasm
+```
+
+**Production:**
+```
+wasm-pack build -t web --features wasm
 ```

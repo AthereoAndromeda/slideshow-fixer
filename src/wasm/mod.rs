@@ -16,9 +16,13 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn init_module() {
-    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    #[cfg(debug_assertions)]
+    {
+        std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    }
 }
 
+// TODO: return Result
 #[wasm_bindgen]
 pub fn js_write_files(file: &[u8]) -> Box<[u8]> {
     let zip_file = Cursor::new(file);
