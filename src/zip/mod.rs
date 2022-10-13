@@ -1,3 +1,4 @@
+use chrono::{Datelike, Timelike};
 use std::io::{self, Cursor, Read, Seek, Write};
 use zip::{result::ZipResult, write::FileOptions, CompressionMethod, ZipArchive, ZipWriter};
 
@@ -60,9 +61,25 @@ pub fn zip_archive(files: &Vec<MyFile>) -> ZipMainResult {
     let buf_writer = Cursor::new(Vec::new());
     let mut zip_writer = ZipWriter::new(buf_writer);
 
-    let options = FileOptions::default().compression_method(CompressionMethod::Deflated);
+    // TODO: Add wasm-compat time for modified
+    let date_time = chrono::offset::Utc::now();
+    let base_options = FileOptions::default().compression_method(CompressionMethod::Deflated);
 
-    for file in files {
+    for i in 0..files.len() {
+        let file = &files[i];
+        let date_time = date_time + chrono::Duration::seconds(i as i64);
+
+        let zip_date_time = zip::DateTime::from_date_and_time(
+            date_time.year() as u16,
+            date_time.month() as u8,
+            date_time.day() as u8,
+            date_time.hour() as u8,
+            date_time.minute() as u8,
+            date_time.second() as u8,
+        )
+        .unwrap();
+
+        let options = base_options.last_modified_time(zip_date_time);
         zip_writer.start_file(&file.name, options)?;
         zip_writer.write_all(&file.buf)?;
     }
