@@ -2,8 +2,9 @@ use std::io::Write;
 use std::{fs, io, path::Path};
 
 use clap::Parser;
-use slideshow_fixer::write_files;
 use slideshow_fixer::zip_main;
+use slideshow_fixer::{write_files, MyZipError};
+use zip::result::ZipError;
 
 /// A simple utility program to fix slideshow sorting order cuz our TV is shit
 #[derive(Debug, Parser)]
@@ -17,8 +18,48 @@ struct Args {
 }
 
 fn process_zip_file(args: &Args) {
-    let file = fs::File::open(&args.path).unwrap();
-    let zip_file = zip_main(file).unwrap();
+    let file_res = fs::File::open(&args.path);
+
+    let file = match file_res {
+        Ok(f) => f,
+        Err(e) => panic!("{}", e),
+    };
+
+    let zip_file_res = zip_main(file);
+
+    // Error handling
+    let zip_file = match zip_file_res {
+        Ok(res) => res,
+
+        Err(err) => match err {
+            // Errors from \`zip\` lib
+            MyZipError::ZipError(err) => {
+                // Check if Invalid or Unsupported. Other errors (I/O) panics
+                match err {
+                    ZipError::InvalidArchive(s) => {
+                        eprintln!(
+                            "Not an actual ZIP file! Check for corruption or if it actually is a ZipFile"
+                        );
+                        eprintln!("{}", s);
+                        std::process::exit(1);
+                    }
+                    ZipError::UnsupportedArchive(s) => {
+                        eprintln!("ZIP File not supported. Deflated algorithm is only supported");
+                        eprintln!("{}", s);
+                        std::process::exit(1);
+                    }
+                    _ => panic!("ZIP Error: {}", err),
+                }
+            }
+
+            // Errors from I/O like reading or writing from files
+            MyZipError::IoError(err) => {
+                eprintln!("I/O Error");
+                eprintln!("{}", err);
+                std::process::exit(1);
+            }
+        },
+    };
 
     let outpath = match &args.output {
         Some(output) => output.to_owned(),
