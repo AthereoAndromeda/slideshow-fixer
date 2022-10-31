@@ -16,21 +16,43 @@ struct Args {
     output: Option<String>,
 }
 
+fn process_zip_file(args: &Args) {
+    let file = fs::File::open(&args.path).unwrap();
+    let zip_file = zip_main(file).unwrap();
+
+    let outpath = match &args.output {
+        Some(output) => output.to_owned(),
+
+        None => {
+            let default_name = Path::new(&args.path);
+
+            // turn `filename` into `filename-1.zip`
+            let file_stem = default_name.file_stem().unwrap();
+            let new_file_stem = file_stem.to_str().unwrap().to_string() + "-1.zip";
+
+            // Attach parent to `file-1`
+            let parent = default_name.parent().unwrap();
+            let default_path = parent.join(new_file_stem);
+            let default_path_string = default_path.display().to_string();
+
+            // println!("{}", &default_path.display());
+
+            default_path_string
+        }
+    };
+
+    let mut outfile = fs::File::create(&outpath).unwrap();
+    outfile.write_all(&zip_file.into_inner()).unwrap();
+
+    println!("File written at {}", &outpath);
+}
+
 fn main() {
     let args = Args::parse();
     let mut entries = Vec::new();
 
     if args.path.ends_with(".zip") {
-        let file = fs::File::open(&args.path).unwrap();
-        let zip_file = zip_main(file).unwrap();
-
-        // TODO: Fix name
-        let outpath = args.output.unwrap_or(args.path + "-1");
-        // let path_name =Path::new(outpath)
-        let mut outfile = fs::File::create(&outpath).unwrap();
-        outfile.write_all(&zip_file.into_inner()).unwrap();
-
-        println!("File written at {}", &outpath);
+        process_zip_file(&args);
         return;
     }
 
