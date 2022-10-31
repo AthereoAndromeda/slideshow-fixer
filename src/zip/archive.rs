@@ -1,10 +1,11 @@
 use chrono::{Datelike, Timelike};
 use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 
-use crate::MyFile;
+use super::MyFile;
+use super::MyZipError;
 use std::io::{Cursor, Write};
 
-pub fn zip_archive(files: &Vec<MyFile>) -> Result<Box<[u8]>, Box<dyn std::error::Error>> {
+pub fn zip_archive(files: &Vec<MyFile>) -> Result<Box<[u8]>, MyZipError> {
     let buffer = Cursor::new(Vec::new());
     let mut zip_writer = ZipWriter::new(buffer);
 

@@ -2,17 +2,20 @@ use std::io::{Read, Seek};
 
 mod archive;
 mod extract;
+mod my_error;
 mod my_file;
+
 pub use archive::zip_archive;
 pub use extract::zip_extract;
+pub use my_error::MyZipError;
 pub use my_file::MyFile;
 
 pub fn zip_sort(files: &mut Vec<MyFile>) {
     files.sort_by(|a, b| a.name.cmp(&b.name));
 }
 
-pub fn zip_main<R: Read + Seek>(reader: R) -> Result<Box<[u8]>, Box<dyn std::error::Error>> {
-    let mut files = zip_extract(reader).unwrap();
+pub fn zip_main<R: Read + Seek>(reader: R) -> Result<Box<[u8]>, MyZipError> {
+    let mut files = zip_extract(reader)?;
     zip_sort(&mut files);
     zip_archive(&files)
 }

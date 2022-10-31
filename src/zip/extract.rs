@@ -1,8 +1,9 @@
-use crate::MyFile;
+use super::MyFile;
+use super::MyZipError;
 use std::io::{Read, Seek};
 use zip::ZipArchive;
 
-pub fn zip_extract<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, Box<dyn std::error::Error>> {
+pub fn zip_extract<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, MyZipError> {
     let mut archive = ZipArchive::new(reader)?;
     let mut files = Vec::with_capacity(archive.file_names().count());
 
