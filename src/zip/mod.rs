@@ -1,5 +1,4 @@
-use std::io::{Cursor, Read, Seek};
-use zip::result::ZipResult;
+use std::io::{Read, Seek};
 
 mod archive;
 mod extract;
@@ -8,13 +7,11 @@ pub use archive::zip_archive;
 pub use extract::zip_extract;
 pub use my_file::MyFile;
 
-type ZipMainResult = ZipResult<Cursor<Vec<u8>>>;
-
 pub fn zip_sort(files: &mut Vec<MyFile>) {
     files.sort_by(|a, b| a.name.cmp(&b.name));
 }
 
-pub fn zip_main<R: Read + Seek>(reader: R) -> ZipMainResult {
+pub fn zip_main<R: Read + Seek>(reader: R) -> Result<Box<[u8]>, Box<dyn std::error::Error>> {
     let mut files = zip_extract(reader).unwrap();
     zip_sort(&mut files);
     zip_archive(&files)
@@ -64,13 +61,13 @@ mod test {
         assert!(files.iter().any(|f| f.name == "03.txt"));
 
         // Check file content/buffer (unsorted)
-        assert!(files.iter().any(|f| f.buf == [0x61, 0x61, 0xA]));
+        assert!(files.iter().any(|f| f.buf == Box::new([0x61, 0x61, 0xA])));
         assert!(files
             .iter()
-            .any(|f| f.buf == [0x61, 0x66, 0x61, 0x73, 0x66, 0xA]));
+            .any(|f| f.buf == Box::new([0x61, 0x66, 0x61, 0x73, 0x66, 0xA])));
         assert!(files
             .iter()
-            .any(|f| f.buf == [0x61, 0x66, 0x61, 0x73, 0x66, 0xA]));
+            .any(|f| f.buf == Box::new([0x61, 0x66, 0x61, 0x73, 0x66, 0xA])));
     }
 
     #[test]
@@ -90,20 +87,21 @@ mod test {
         let files = vec![
             MyFile {
                 name: "04.txt".to_string(),
-                buf: vec![0x61, 0x61, 0xA],
+                buf: vec![0x61, 0x61, 0xA].into_boxed_slice(),
             },
             MyFile {
                 name: "07.txt".to_string(),
-                buf: vec![0x61, 0x66, 0x61, 0x23, 0x66, 0xA],
+                buf: vec![0x61, 0x66, 0x61, 0x23, 0x66, 0xA].into_boxed_slice(),
             },
             MyFile {
                 name: "05.txt".to_string(),
-                buf: vec![0x61, 0x66, 0x60, 0x73, 0x66, 0xA],
+                buf: vec![0x61, 0x66, 0x60, 0x73, 0x66, 0xA].into_boxed_slice(),
             },
         ];
 
         let zip_file = zip_archive(&files).unwrap();
-        let mut files = zip_extract(zip_file).unwrap();
+        let buf = Cursor::new(zip_file);
+        let mut files = zip_extract(buf).unwrap();
 
         // Check file names (unsorted)
         assert!(files.iter().any(|f| f.name == "04.txt"));

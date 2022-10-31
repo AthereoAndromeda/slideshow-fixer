@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct MyFile {
     pub name: String,
-    pub buf: Vec<u8>,
+    pub buf: Box<[u8]>,
 }
 
 impl std::fmt::Display for MyFile {

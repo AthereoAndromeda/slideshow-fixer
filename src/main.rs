@@ -42,7 +42,7 @@ fn process_zip_file(args: &Args) {
     };
 
     let mut outfile = fs::File::create(&outpath).unwrap();
-    outfile.write_all(&zip_file.into_inner()).unwrap();
+    outfile.write_all(&zip_file).unwrap();
 
     println!("File written at {}", &outpath);
 }

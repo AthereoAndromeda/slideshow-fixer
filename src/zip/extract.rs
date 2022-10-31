@@ -1,5 +1,5 @@
 use crate::MyFile;
-use std::io::{self, Read, Seek};
+use std::io::{Read, Seek};
 use zip::ZipArchive;
 
 pub fn zip_extract<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, Box<dyn std::error::Error>> {
@@ -26,12 +26,12 @@ pub fn zip_extract<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, Box<dyn std
                 file.size()
             );
 
-            let mut buf_writer = Vec::new();
-            io::copy(&mut file, &mut buf_writer)?;
+            let mut buf = Vec::new();
+            file.read_to_end(&mut buf)?;
 
             let my_file = MyFile {
                 name: outpath.file_name().unwrap().to_string_lossy().to_string(),
-                buf: buf_writer,
+                buf: buf.into_boxed_slice(),
             };
 
             files.push(my_file);

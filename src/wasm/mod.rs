@@ -27,7 +27,5 @@ pub fn init_module() {
 pub fn js_write_files(file: &[u8]) -> Box<[u8]> {
     let zip_file = Cursor::new(file);
     let extracted = zip_main(zip_file).unwrap();
-    let inner = extracted.into_inner();
-
-    inner.into_boxed_slice()
+    extracted
 }
