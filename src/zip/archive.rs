@@ -40,6 +40,9 @@ pub fn zip_archive(files: &Vec<MyFile>) -> Result<Box<[u8]>, MyZipError> {
         let file = &files[i];
         zip_writer.start_file(&file.name, options)?;
         zip_writer.write_all(&file.buf)?;
+
+        #[cfg(debug_assertions)]
+        println!("File {i} written");
     }
 
     let zip_buffer = zip_writer.finish()?;

@@ -20,6 +20,7 @@ pub fn zip_extract<R: Read + Seek>(reader: R) -> Result<Vec<MyFile>, MyZipError>
             // println!("File {} extracted to \"{}\"", i, outpath.display());
             // fs::create_dir_all(&outpath).unwrap();
         } else {
+            #[cfg(debug_assertions)]
             println!(
                 "File {} extracted to \"{}\" ({} bytes)",
                 i,
