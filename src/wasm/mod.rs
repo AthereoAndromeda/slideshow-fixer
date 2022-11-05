@@ -8,18 +8,16 @@ use wee_alloc::WeeAlloc;
 #[global_allocator]
 static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
-// Import the `window.alert` function from the Web.
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
+// // Import the `window.alert` function from the Web.
+// #[wasm_bindgen]
+// extern "C" {
+//     fn alert(s: &str);
+// }
 
 #[wasm_bindgen]
-pub fn init_module() {
+pub fn attach_panic_hook() {
     #[cfg(debug_assertions)]
-    {
-        std::panic::set_hook(Box::new(console_error_panic_hook::hook));
-    }
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 }
 
 // TODO: return Result
