@@ -1,8 +1,15 @@
 #![allow(dead_code)]
-use crate::zip_main;
+use super::{zip_main, MyZipError};
 use std::io::Cursor;
 use wasm_bindgen::prelude::*;
 use wee_alloc::WeeAlloc;
+
+impl Into<JsValue> for MyZipError {
+    fn into(self) -> JsValue {
+        let s = self.to_string();
+        JsValue::from_str(&s)
+    }
+}
 
 // Default allocator for WASM
 #[global_allocator]
@@ -20,10 +27,9 @@ pub fn attach_panic_hook() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 }
 
-// TODO: return Result
 #[wasm_bindgen]
-pub fn js_write_files(file: &[u8]) -> Box<[u8]> {
+pub fn js_write_files(file: &[u8]) -> Result<Box<[u8]>, MyZipError> {
     let zip_file = Cursor::new(file);
-    let extracted = zip_main(zip_file).unwrap();
-    extracted
+    let extracted = zip_main(zip_file)?;
+    Ok(extracted)
 }
