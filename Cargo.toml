@@ -21,6 +21,7 @@ wasm = [
 clap = { version = "4.0.10", features = ["derive"] }
 zip = { version = "0.6.2", features = ["deflate"], default-features = false }
 chrono = { version = "0.4", features = ["clock"], default-features = false }
+filetime = "0.2"
 
 # WASM-only deps
 console_error_panic_hook = { version = "0.1.7", optional = true }
