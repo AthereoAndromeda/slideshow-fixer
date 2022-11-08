@@ -141,7 +141,7 @@ fn main() {
         }
     }
 
-    write_files(&entries, output_path).unwrap();
+    write_files(entries, output_path.to_path_buf()).unwrap();
     println!("Completed Sucessfully");
 }
 
