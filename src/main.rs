@@ -40,22 +40,22 @@ fn process_zip_file(args: &Args) {
                         eprintln!(
                             "Not an actual ZIP file! Check for corruption or if it actually is a ZipFile"
                         );
-                        eprintln!("{}", s);
+                        eprintln!("{s}");
                         std::process::exit(1);
                     }
                     ZipError::UnsupportedArchive(s) => {
                         eprintln!("ZIP File not supported. Deflated algorithm is only supported");
-                        eprintln!("{}", s);
+                        eprintln!("{s}");
                         std::process::exit(1);
                     }
-                    _ => panic!("ZIP Error: {}", err),
+                    _ => panic!("ZIP Error: {err}"),
                 }
             }
 
             // Errors from I/O like reading or writing from files
             MyZipError::IoError(err) => {
                 eprintln!("I/O Error");
-                eprintln!("{}", err);
+                eprintln!("{err}");
                 std::process::exit(1);
             }
         },
@@ -102,7 +102,7 @@ fn main() {
         Ok(f) => f,
         Err(e) => match e.kind() {
             io::ErrorKind::NotFound => {
-                eprintln!("Cannot Find Directory!\n{}", e);
+                eprintln!("Cannot Find Directory!\n{e}");
                 std::process::exit(1);
             }
 
@@ -113,7 +113,7 @@ fn main() {
     for file in input_dir {
         match file {
             Ok(f) => entries.push(f),
-            Err(e) => eprintln!("Error opening file: {}", e),
+            Err(e) => eprintln!("Error opening file: {e}"),
         }
     }
 
