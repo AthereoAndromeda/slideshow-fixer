@@ -10,7 +10,7 @@ pub use extract::zip_extract;
 pub use my_error::MyZipError;
 pub use my_file::MyFile;
 
-pub fn zip_sort(files: &mut Vec<MyFile>) {
+pub fn zip_sort(files: &mut [MyFile]) {
     files.sort_by(|a, b| a.name.cmp(&b.name));
 }
 
