@@ -92,7 +92,7 @@ fn main() {
     let args = Args::parse();
     let mut entries = Vec::new();
 
-    if args.path.ends_with(".zip") {
+    if args.path.to_lowercase().ends_with(".zip") {
         process_zip_file(&args);
         return;
     }
@@ -145,7 +145,7 @@ fn main() {
     println!("Completed Sucessfully");
 }
 
-pub fn prompt_overwrite(output_path: &Path) {
+fn prompt_overwrite(output_path: &Path) {
     println!(
         "{} already exists. Overwrite directory? (Will erase ALL content of directory) [Y/n]",
         output_path.display()
