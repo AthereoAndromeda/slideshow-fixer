@@ -1,5 +1,6 @@
-mod zip;
-pub use crate::zip::*;
+// mod zip;
+// pub use crate::zip::*;
+pub mod zip;
 
 #[cfg(feature = "wasm")]
 mod wasm;

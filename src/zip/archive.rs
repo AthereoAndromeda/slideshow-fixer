@@ -27,7 +27,7 @@ fn get_date_time(date_time: chrono::DateTime<Utc>, i: usize) -> zip::DateTime {
     .unwrap()
 }
 
-pub fn zip_archive(files: &[MyFile]) -> Result<Box<[u8]>, MyZipError> {
+pub fn archive(files: &[MyFile]) -> Result<Box<[u8]>, MyZipError> {
     let buffer = Cursor::new(Vec::new());
     let mut zip_writer = ZipWriter::new(buffer);
 

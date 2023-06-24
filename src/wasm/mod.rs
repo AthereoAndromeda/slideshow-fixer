@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use super::{zip_main, MyZipError};
+use super::zip::{run_process, MyZipError};
 use std::io::Cursor;
 use wasm_bindgen::prelude::*;
 use wee_alloc::WeeAlloc;
@@ -30,6 +30,6 @@ pub fn attach_panic_hook() {
 #[wasm_bindgen]
 pub fn js_write_files(file: &[u8]) -> Result<Box<[u8]>, MyZipError> {
     let zip_file = Cursor::new(file);
-    let extracted = zip_main(zip_file)?;
+    let extracted = run_process(zip_file)?;
     Ok(extracted)
 }

@@ -2,8 +2,8 @@ use std::io::Write;
 use std::{fs, io, path::Path};
 
 use clap::Parser;
-use slideshow_fixer::zip_main;
-use slideshow_fixer::{write_files, MyZipError};
+use slideshow_fixer::write_files;
+use slideshow_fixer::zip::{run_process, MyZipError};
 use zip::result::ZipError;
 
 /// A simple utility program to fix slideshow sorting order cuz our TV is shit
@@ -25,7 +25,7 @@ fn process_zip_file(args: &Args) {
         Err(e) => panic!("{}", e),
     };
 
-    let zip_file_res = zip_main(file);
+    let zip_file_res = run_process(file);
 
     // Error handling
     let zip_file = match zip_file_res {

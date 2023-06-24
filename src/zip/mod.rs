@@ -5,24 +5,29 @@ mod extract;
 mod my_error;
 mod my_file;
 
-pub use archive::zip_archive;
-pub use extract::zip_extract;
+pub use archive::archive;
+pub use extract::extract;
 pub use my_error::MyZipError;
 pub use my_file::MyFile;
 
-pub fn zip_sort(files: &mut [MyFile]) {
-    files.sort_by(|a, b| a.name.cmp(&b.name));
+pub mod sort {
+    use super::MyFile;
+
+    pub fn sort(files: &mut [MyFile]) {
+        files.sort_by(|a, b| a.name.cmp(&b.name));
+    }
 }
 
-pub fn zip_main<R: Read + Seek>(reader: R) -> Result<Box<[u8]>, MyZipError> {
-    let mut files = zip_extract(reader)?;
-    zip_sort(&mut files);
-    zip_archive(&files)
+pub fn run_process<R: Read + Seek>(reader: R) -> Result<Box<[u8]>, MyZipError> {
+    let mut files = extract(reader)?;
+    sort::sort(&mut files);
+    archive(&files)
 }
 
 #[cfg(test)]
 mod test {
-    use crate::{zip_archive, zip_extract, zip_sort, MyFile};
+    use super::sort::sort;
+    use super::{archive, extract, MyFile};
     use std::io::Cursor;
 
     const ZIP_TEST_DATA: &[u8; 547] = include_bytes!("./test.zip");
@@ -31,7 +36,7 @@ mod test {
     #[allow(unused_allocation)]
     fn zip_extract_test() {
         let zip_file = Cursor::new(ZIP_TEST_DATA);
-        let files = zip_extract(zip_file).unwrap();
+        let files = extract(zip_file).unwrap();
 
         assert_eq!(files.len(), 3);
 
@@ -53,9 +58,9 @@ mod test {
     #[test]
     fn zip_sort_test() {
         let zip_file = Cursor::new(ZIP_TEST_DATA);
-        let mut files = zip_extract(zip_file).unwrap();
+        let mut files = extract(zip_file).unwrap();
 
-        zip_sort(&mut files);
+        sort(&mut files);
 
         assert_eq!(files[0].name, "01.txt");
         assert_eq!(files[1].name, "02.txt");
@@ -79,16 +84,16 @@ mod test {
             },
         ];
 
-        let zip_file = zip_archive(&files).unwrap();
+        let zip_file = archive(&files).unwrap();
         let buf = Cursor::new(zip_file);
-        let mut files = zip_extract(buf).unwrap();
+        let mut files = extract(buf).unwrap();
 
         // Check file names (unsorted)
         assert!(files.iter().any(|f| f.name == "04.txt"));
         assert!(files.iter().any(|f| f.name == "07.txt"));
         assert!(files.iter().any(|f| f.name == "05.txt"));
 
-        zip_sort(&mut files);
+        sort(&mut files);
 
         assert_eq!(files[0].name, "04.txt");
         assert_eq!(files[1].name, "05.txt");
