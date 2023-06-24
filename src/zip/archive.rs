@@ -33,11 +33,10 @@ pub fn zip_archive(files: &Vec<MyFile>) -> Result<Box<[u8]>, MyZipError> {
     let date_time = chrono::offset::Utc::now();
     let base_options = FileOptions::default().compression_method(CompressionMethod::Deflated);
 
-    for i in 0..files.len() {
+    for (i, file) in files.iter().enumerate() {
         let zip_date_time = get_date_time(date_time, i);
         let options = base_options.last_modified_time(zip_date_time);
 
-        let file = &files[i];
         zip_writer.start_file(&file.name, options)?;
         zip_writer.write_all(&file.buf)?;
 
