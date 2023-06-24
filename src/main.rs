@@ -155,12 +155,12 @@ pub fn prompt_overwrite(output_path: &Path) {
     io::stdin().read_line(&mut buf).unwrap();
     let buf = buf.trim();
 
-    if buf != "Y" {
-        println!("Aborting...");
-        std::process::exit(1)
-    } else {
+    if buf == "Y" {
         println!("Overwriting...");
         fs::remove_dir_all(output_path).unwrap();
         fs::create_dir(output_path).unwrap();
+    } else {
+        println!("Aborting...");
+        std::process::exit(1)
     }
 }
