@@ -28,6 +28,7 @@ mod test {
     const ZIP_TEST_DATA: &[u8; 547] = include_bytes!("./test.zip");
 
     #[test]
+    #[allow(unused_allocation)]
     fn zip_extract_test() {
         let zip_file = Cursor::new(ZIP_TEST_DATA);
         let files = zip_extract(zip_file).unwrap();
