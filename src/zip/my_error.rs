@@ -26,8 +26,8 @@ impl From<io::Error> for MyZipError {
 impl fmt::Display for MyZipError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::IoError(io) => write!(f, "IOError: {}", io.kind().to_string()),
-            Self::ZipError(err) => write!(f, "ZipError: {}", err.to_string()),
+            Self::IoError(io) => write!(f, "IOError: {}", io.kind()),
+            Self::ZipError(err) => write!(f, "ZipError: {}", err),
         }
     }
 }
