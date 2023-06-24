@@ -118,7 +118,7 @@ fn main() {
     }
 
     // sort numerically
-    entries.sort_by(|a, b| a.path().cmp(&b.path()));
+    entries.sort_by_key(|a| a.path());
 
     // Remove trailing /
     let arg_path = args.path.strip_suffix("/").unwrap_or(&args.path);
