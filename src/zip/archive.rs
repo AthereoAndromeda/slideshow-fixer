@@ -5,6 +5,7 @@ use super::MyFile;
 use super::MyZipError;
 use std::io::{Cursor, Write};
 
+#[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
 /// Helper function to both convert `chrono::DateTime` to `zip::DateTime`
 /// and adds `i` seconds to `DateTime`.
 ///
