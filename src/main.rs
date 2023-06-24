@@ -121,7 +121,7 @@ fn main() {
     entries.sort_by_key(|a| a.path());
 
     // Remove trailing /
-    let arg_path = args.path.strip_suffix("/").unwrap_or(&args.path);
+    let arg_path = args.path.strip_suffix('/').unwrap_or(&args.path);
 
     // Create output path name
     let output_path_name = args.output.unwrap_or(format!("{}-{}", arg_path, "1"));
