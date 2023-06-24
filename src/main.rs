@@ -62,7 +62,7 @@ fn process_zip_file(args: &Args) {
     };
 
     let outpath = match &args.output {
-        Some(output) => output.to_owned(),
+        Some(output) => output.clone(),
 
         None => {
             let default_name = Path::new(&args.path);
