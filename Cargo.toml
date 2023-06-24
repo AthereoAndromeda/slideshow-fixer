@@ -18,8 +18,8 @@ wasm = [
 ]
 
 [dependencies]
-clap = { version = "4.0.10", features = ["derive"] }
-zip = { version = "0.6.2", features = ["deflate"], default-features = false }
+clap = { version = "4.3", features = ["derive"] }
+zip = { version = "0.6", features = ["deflate"], default-features = false }
 chrono = { version = "0.4", features = ["clock"], default-features = false }
 
 # WASM-only deps
