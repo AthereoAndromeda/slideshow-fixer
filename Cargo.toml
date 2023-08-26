@@ -10,12 +10,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [features]
-wasm = [
-    "dep:console_error_panic_hook",
-    "dep:wee_alloc",
-    "dep:wasm-bindgen",
-    "chrono/wasmbind",
-]
+wasm = ["dep:console_error_panic_hook", "dep:wee_alloc", "dep:wasm-bindgen", "chrono/wasmbind"]
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
@@ -26,6 +21,8 @@ chrono = { version = "0.4", features = ["clock"], default-features = false }
 console_error_panic_hook = { version = "0.1.7", optional = true }
 wee_alloc = { version = "0.4.5", optional = true }
 wasm-bindgen = { version = "0.2.87", optional = true }
+thiserror = "1.0.47"
+displaydoc = "0.2.4"
 
 [profile.release]
 lto = true
