@@ -14,18 +14,18 @@ wasm = [
     "dep:console_error_panic_hook",
     "dep:wee_alloc",
     "dep:wasm-bindgen",
-    "chrono/wasmbind"
+    "chrono/wasmbind",
 ]
 
 [dependencies]
-clap = { version = "4.3", features = ["derive"] }
+clap = { version = "4.4", features = ["derive"] }
 zip = { version = "0.6", features = ["deflate"], default-features = false }
 chrono = { version = "0.4", features = ["clock"], default-features = false }
 
 # WASM-only deps
 console_error_panic_hook = { version = "0.1.7", optional = true }
 wee_alloc = { version = "0.4.5", optional = true }
-wasm-bindgen = { version = "0.2.83", optional = true }
+wasm-bindgen = { version = "0.2.87", optional = true }
 
 [profile.release]
 lto = true
